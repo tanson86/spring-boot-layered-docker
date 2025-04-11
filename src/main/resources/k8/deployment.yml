@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: kbe-rest
+  name: kbe-rest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kbe-rest
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: kbe-rest
+    spec:
+      containers:
+      - image: tanson/kbe-rest-brewery
+        name: kbe-rest-brewery
+        resources: {}
+        env:
+        - name: LOGGING_LEVEL_GURU_SPRINGFRAMEWORK_SFGRESTBREWERY
+          value: info
+        - name: MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED
+          value: "true"
+        - name: MANAGEMENT_HEALTH_READINESSTATE_ENABLED
+          value: "true"
+        - name: MANAGEMENT_HEALTH_LIVENESSTATE_ENABLED
+          value: "true"
+        - name: SERVER_SHUTDOWN
+          value: "graceful"
+        lifecycle:
+          preStop:
+            exec:
+              command: ["sh", "-c", "sleep 10"]
+        readinessProbe:
+          httpGet:
+            port: 8080
+            path: /actuator/health/readiness
+        livenessProbe:
+          httpGet:
+            port: 8080
+            path: /actuator/health/liveness
+status: {}
